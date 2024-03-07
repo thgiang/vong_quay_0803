@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vòng Quay May Mắn</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <style>
+        .gd {
+            font-size: 3em;
+            background: -webkit-linear-gradient(#62146e, #d2185f);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .gd2 {
+            margin-top: 15px;
+            display: block;
+            font-size: 1.5em;
+            background: -webkit-linear-gradient(#62146e, #d2185f);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        body {
+            text-align: center;
+            font-family: 'Dancing Script';
+        }
+        #wheel {
+            margin: 0 auto;
+            width: 70vw;
+            height: 70vw;
+            max-width: 70vh;
+            max-height: 70vh;
+            transition: transform 4s;
+        }
+
+        .btn-grad {
+            background-image: linear-gradient(to right, #e52d27 0%, #b31217  51%, #e52d27  100%);
+            padding: 15px 45px;
+            text-align: center;
+            text-transform: uppercase;
+            transition: 0.5s;
+            background-size: 200% auto;
+            color: white;
+            box-shadow: 0 0 20px #eee;
+            border-radius: 10px;
+            display: block;
+            margin: 20px auto;
+        }
+
+        .btn-grad:hover {
+            background-position: right center; /* change the direction of the change here */
+            color: #fff;
+            text-decoration: none;
+        }
+
+    </style>
+</head>
+<body>
+<h1 class="gd" style="font-weight: bold">Vòng quay may mắn ZangTee</h1>
+<div style="position: relative;">
+    <img src="bg.png" id="wheel" />
+    <img src="cur.png" style="position: absolute; bottom: 0; right: calc(50% - 15vw); height: 15vw" />
+</div>
+<strong class="gd2" id="trung"></strong>
+<form id="spinForm" style="margin-top: 15px; display: none">
+    <label for="name">Nhập cơ sở và tên bạn:</label>
+    <input type="text" id="name" name="name" required placeholder="Ví dụ: CS1 Phươn" value="Haha">
+    <button id="spin" class="btn-grad">Quay</button>
+</form>
+
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    var name = localStorage.getItem('name');
+    var prize = localStorage.getItem('prize');
+    if (name && prize) {
+      document.getElementById('trung').innerHTML = 'Chúc mừng ' + name + ' với món quà nhỏ 8/3 là tiền mặt trị giá ' + prize+ '. Chúc bạn luôn vui vẻ và hạnh phúc và gắn bó cùng ZangTee thật lâuuuuu!';
+      document.getElementById('spinForm').style.display = 'none';
+    } else {
+        document.getElementById('spinForm').style.display = 'block';
+    }
+  });
+
+  document.getElementById('spinForm').addEventListener('submit', function(event) {
+    event.preventDefault(); // Ngăn không cho form submit theo cách truyền thống
+
+    function quay(prize) {
+
+      var degree = Math.floor(Math.random() * 6 + 5);
+
+      if (prize === '500k') {
+        degree += 3.0/6;
+      } else if (prize === '200k') {
+        degree += 4.0/6;
+      }  else if (prize === '150k') {
+        degree += 5.0/6;
+      }
+      else if (prize === '100k') {
+        degree += 1.0/3;
+      }
+      degree *= 360;
+
+      var wheel = document.getElementById('wheel');
+      wheel.style.transition = 'transform 4s';
+      wheel.style.transform = 'rotate(' + degree + 'deg)';
+
+      // Save to local storage name and prize
+      localStorage.setItem('name', name);
+      localStorage.setItem('prize', prize);
+    }
+
+    var name = document.getElementById('name').value;
+    fetch('do.php', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: 'name=' + encodeURIComponent(name)
+    })
+      .then(response => response.text())
+      .then(prize => {
+        quay(prize);
+        // Hiển thị kết quả sau khi vòng quay dừng
+        setTimeout(function() {
+            alert('Chúc mừng bạn. Phần thưởng của bạn là tiền mặt trị giá: ' + prize);
+            window.location.reload();
+          }, 4000);
+
+      })
+      .catch(err => console.error(err));
+  });
+</script>
+</body>
+</html>
